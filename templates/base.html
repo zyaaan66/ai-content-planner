@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" class="{{ 'light' if current_user.is_authenticated and not current_user.dark_mode else '' }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}AI Content Planner{% endblock %}</title>
+  <meta name="description" content="AI-powered content planning SaaS — generate ideas, captions, SEO titles and full content calendars with Gemini AI.">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            base: '#0b0e14',
+            elevated: '#111521',
+            accent: '#7c5cfc',
+            'accent-2': '#22d3c7',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="min-h-screen">
+
+  {% if current_user.is_authenticated %}
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <div id="sidebar-overlay" class="hidden fixed inset-0 bg-black/50 z-30 lg:hidden"></div>
+    <aside id="sidebar" class="fixed lg:sticky top-0 left-0 h-screen w-64 shrink-0 z-40 -translate-x-full lg:translate-x-0 transition-transform duration-200 glass-card lg:rounded-none border-y-0 border-l-0 flex flex-col">
+      <div class="flex items-center justify-between px-5 py-5">
+        <a href="{{ url_for('main.dashboard') }}" class="flex items-center gap-2.5">
+          <span class="ai-pulse w-2.5 h-2.5 rounded-full bg-[var(--accent-primary)]"></span>
+          <span class="font-display font-semibold text-[15px] tracking-tight">AI Content Planner</span>
+        </a>
+        <button id="sidebar-close" class="lg:hidden text-[var(--text-muted)]">✕</button>
+      </div>
+
+      <nav class="flex-1 px-3 space-y-1 overflow-y-auto">
+        <a href="{{ url_for('main.dashboard') }}" class="sidebar-link {{ 'active' if request.endpoint == 'main.dashboard' }}">
+          <span>▦</span> Dashboard
+        </a>
+        <a href="{{ url_for('main.planner') }}" class="sidebar-link {{ 'active' if request.endpoint == 'main.planner' }}">
+          <span>✦</span> Content Planner
+        </a>
+        <a href="{{ url_for('main.history') }}" class="sidebar-link {{ 'active' if request.endpoint == 'main.history' }}">
+          <span>◷</span> History
+        </a>
+        <a href="{{ url_for('main.categories') }}" class="sidebar-link {{ 'active' if request.endpoint == 'main.categories' }}">
+          <span>▤</span> Categories
+        </a>
+        <a href="{{ url_for('main.saved_prompts') }}" class="sidebar-link {{ 'active' if request.endpoint == 'main.saved_prompts' }}">
+          <span>❝</span> Saved Prompts
+        </a>
+        <div class="h-px bg-[var(--glass-border)] my-3"></div>
+        <a href="{{ url_for('main.profile') }}" class="sidebar-link {{ 'active' if request.endpoint == 'main.profile' }}">
+          <span>◉</span> Profile
+        </a>
+        <a href="{{ url_for('main.settings') }}" class="sidebar-link {{ 'active' if request.endpoint == 'main.settings' }}">
+          <span>⚙</span> Settings
+        </a>
+      </nav>
+
+      <div class="p-4">
+        <a href="{{ url_for('auth.logout') }}" class="sidebar-link text-[var(--danger)]">
+          <span>⏻</span> Logout
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main column -->
+    <div class="flex-1 min-w-0 flex flex-col">
+      <!-- Topbar -->
+      <header class="sticky top-0 z-20 backdrop-blur-md border-b border-[var(--glass-border)] bg-[var(--bg-base)]/70">
+        <div class="flex items-center justify-between px-5 py-3.5">
+          <button id="sidebar-open" class="lg:hidden text-[var(--text-muted)]">☰</button>
+          <div class="hidden lg:block text-sm text-[var(--text-muted)] font-mono">{{ current_year }} · {{ current_user.username }}</div>
+          <div class="flex items-center gap-3">
+            <button id="theme-toggle" class="w-9 h-9 rounded-full glass-card flex items-center justify-center text-sm">🌓</button>
+            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-secondary)] flex items-center justify-center text-xs font-semibold">
+              {{ current_user.username[0]|upper }}
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Toasts -->
+      <div class="fixed top-16 right-5 z-50 space-y-2 w-80 max-w-[90vw]">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% for category, message in messages %}
+            <div class="toast glass-card px-4 py-3 text-sm border-l-4
+              {{ 'border-l-[var(--success)]' if category == 'success' else
+                 'border-l-[var(--danger)]' if category == 'danger' else
+                 'border-l-[var(--warning)]' if category == 'warning' else
+                 'border-l-[var(--accent-secondary)]' }}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        {% endwith %}
+      </div>
+
+      <main class="flex-1 p-5 lg:p-8">
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+  </div>
+  {% else %}
+    <div class="fixed top-5 right-5 z-50 space-y-2 w-80 max-w-[90vw]">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+          <div class="toast glass-card px-4 py-3 text-sm border-l-4
+            {{ 'border-l-[var(--success)]' if category == 'success' else
+               'border-l-[var(--danger)]' if category == 'danger' else
+               'border-l-[var(--warning)]' if category == 'warning' else
+               'border-l-[var(--accent-secondary)]' }}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endwith %}
+    </div>
+    {% block auth_content %}{% endblock %}
+  {% endif %}
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

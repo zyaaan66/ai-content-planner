@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}History · AI Content Planner{% endblock %}
+{% block content %}
+
+<div class="mb-6">
+  <h1 class="font-display font-semibold text-2xl">History</h1>
+  <p class="text-[var(--text-muted)] text-sm mt-1">All content you've generated, searchable and filterable.</p>
+</div>
+
+<form method="GET" class="glass-card p-4 mb-5 flex flex-col sm:flex-row gap-3">
+  <input id="history-search" type="text" name="q" value="{{ query_text }}" placeholder="Search by title..."
+    class="flex-1 bg-transparent border border-[var(--glass-border)] rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[var(--accent-primary)]">
+  <select name="type" onchange="this.form.requestSubmit()" class="bg-[var(--bg-elevated)] border border-[var(--glass-border)] rounded-lg px-3 py-2 text-sm">
+    <option value="">All Types</option>
+    {% for t in ['idea', 'caption', 'seo_title', 'keyword', 'script', 'calendar', 'rewrite', 'improve'] %}
+    <option value="{{ t }}" {{ 'selected' if content_type == t }}>{{ t.replace('_', ' ')|title }}</option>
+    {% endfor %}
+  </select>
+</form>
+
+{% if contents %}
+<div class="glass-card overflow-hidden">
+  <table class="w-full text-sm">
+    <thead>
+      <tr class="text-left text-[var(--text-muted)] text-xs uppercase tracking-wide border-b border-[var(--glass-border)]">
+        <th class="px-5 py-3">Title</th>
+        <th class="px-5 py-3">Type</th>
+        <th class="px-5 py-3">Status</th>
+        <th class="px-5 py-3">Created</th>
+        <th class="px-5 py-3 text-right">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in contents %}
+      <tr class="border-b border-[var(--glass-border)] last:border-0">
+        <td class="px-5 py-3.5 font-medium max-w-xs truncate">{{ item.title }}</td>
+        <td class="px-5 py-3.5 font-mono text-xs text-[var(--text-muted)]">{{ item.content_type }}</td>
+        <td class="px-5 py-3.5">
+          <form method="POST" action="{{ url_for('main.update_status', content_id=item.id) }}">
+            <select name="status" onchange="this.form.requestSubmit()" class="bg-transparent text-xs rounded-full px-2 py-1 border border-[var(--glass-border)]">
+              {% for s in ['draft', 'scheduled', 'published'] %}
+              <option value="{{ s }}" {{ 'selected' if item.status == s }}>{{ s }}</option>
+              {% endfor %}
+            </select>
+          </form>
+        </td>
+        <td class="px-5 py-3.5 text-[var(--text-muted)] text-xs font-mono">{{ item.created_at.strftime('%b %d, %Y') }}</td>
+        <td class="px-5 py-3.5 text-right">
+          <details class="inline-block relative">
+            <summary class="cursor-pointer text-[var(--accent-primary)] text-xs list-none">View</summary>
+            <div class="absolute right-0 mt-2 w-72 glass-card p-3 z-10 text-xs whitespace-pre-wrap font-mono max-h-60 overflow-y-auto">{{ item.ai_output }}</div>
+          </details>
+          <form method="POST" action="{{ url_for('main.delete_content', content_id=item.id) }}" class="inline" onsubmit="return confirm('Delete this content?');">
+            <button type="submit" class="text-[var(--danger)] text-xs ml-3">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Pagination -->
+{% if pagination.pages > 1 %}
+<div class="flex justify-center gap-2 mt-5">
+  {% for p in pagination.iter_pages() %}
+    {% if p %}
+      <a href="{{ url_for('main.history', page=p, q=query_text, type=content_type) }}"
+        class="w-8 h-8 flex items-center justify-center rounded-lg text-sm {{ 'bg-[var(--accent-primary)] text-white' if p == pagination.page else 'glass-card' }}">{{ p }}</a>
+    {% else %}
+      <span class="w-8 h-8 flex items-center justify-center text-[var(--text-faint)]">…</span>
+    {% endif %}
+  {% endfor %}
+</div>
+{% endif %}
+
+{% else %}
+<div class="glass-card p-10 text-center">
+  <p class="text-[var(--text-muted)] text-sm">No content found.</p>
+  <a href="{{ url_for('main.planner') }}" class="inline-block mt-3 text-[var(--accent-primary)] text-sm">Generate your first content →</a>
+</div>
+{% endif %}
+
+{% endblock %}

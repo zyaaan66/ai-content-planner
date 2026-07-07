@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · AI Content Planner{% endblock %}
+{% block content %}
+
+<div class="flex items-center justify-between mb-6">
+  <div>
+    <h1 class="font-display font-semibold text-2xl">Dashboard</h1>
+    <p class="text-[var(--text-muted)] text-sm mt-1">Here's what's happening with your content.</p>
+  </div>
+  <a href="{{ url_for('main.planner') }}" class="bg-[var(--accent-primary)] text-white text-sm font-medium px-4 py-2.5 rounded-lg hover:opacity-90 transition">
+    + Generate Content
+  </a>
+</div>
+
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+  <div class="glass-card glass-card-hover p-5">
+    <p class="text-[var(--text-muted)] text-xs uppercase tracking-wide">Total Content</p>
+    <p class="font-display text-3xl font-semibold mt-2">{{ stats.total }}</p>
+  </div>
+  <div class="glass-card glass-card-hover p-5">
+    <p class="text-[var(--text-muted)] text-xs uppercase tracking-wide">Published</p>
+    <p class="font-display text-3xl font-semibold mt-2 text-[var(--success)]">{{ stats.published }}</p>
+  </div>
+  <div class="glass-card glass-card-hover p-5">
+    <p class="text-[var(--text-muted)] text-xs uppercase tracking-wide">Scheduled</p>
+    <p class="font-display text-3xl font-semibold mt-2 text-[var(--accent-secondary)]">{{ stats.scheduled }}</p>
+  </div>
+  <div class="glass-card glass-card-hover p-5">
+    <p class="text-[var(--text-muted)] text-xs uppercase tracking-wide">Drafts</p>
+    <p class="font-display text-3xl font-semibold mt-2 text-[var(--warning)]">{{ stats.drafts }}</p>
+  </div>
+</div>
+
+<div class="grid lg:grid-cols-3 gap-5">
+  <!-- Recent content -->
+  <div class="lg:col-span-2 glass-card p-5">
+    <h2 class="font-display font-semibold mb-4">Recent Content</h2>
+    {% if recent_content %}
+    <div class="space-y-3">
+      {% for item in recent_content %}
+      <div class="flex items-center justify-between border-b border-[var(--glass-border)] pb-3 last:border-0 last:pb-0">
+        <div class="min-w-0">
+          <p class="text-sm font-medium truncate">{{ item.title }}</p>
+          <p class="text-xs text-[var(--text-muted)] font-mono">{{ item.content_type }} · {{ item.created_at.strftime('%b %d, %Y') }}</p>
+        </div>
+        <span class="text-xs px-2.5 py-1 rounded-full shrink-0 ml-3
+          {{ 'bg-[var(--success)]/15 text-[var(--success)]' if item.status == 'published' else
+             'bg-[var(--accent-secondary)]/15 text-[var(--accent-secondary)]' if item.status == 'scheduled' else
+             'bg-[var(--warning)]/15 text-[var(--warning)]' }}">
+          {{ item.status }}
+        </span>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-10">
+      <p class="text-[var(--text-muted)] text-sm">No content yet. Generate your first piece of content to see it here.</p>
+      <a href="{{ url_for('main.planner') }}" class="inline-block mt-3 text-[var(--accent-primary)] text-sm">Get started →</a>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Activity chart -->
+  <div class="glass-card p-5">
+    <h2 class="font-display font-semibold mb-4">7-Day Activity</h2>
+    {% if chart_values %}
+    <div class="flex items-end gap-2 h-40">
+      {% set max_val = chart_values|max %}
+      {% for label in chart_labels %}
+      <div class="flex-1 flex flex-col items-center gap-1.5">
+        <div class="w-full rounded-t bg-gradient-to-t from-[var(--accent-primary)] to-[var(--accent-secondary)]"
+             style="height: {{ (chart_values[loop.index0] / max_val * 100) if max_val else 0 }}%; min-height: 4px;"></div>
+        <span class="text-[10px] text-[var(--text-faint)] font-mono">{{ label[-2:] }}</span>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-[var(--text-muted)] text-sm text-center py-14">No activity in the last 7 days yet.</p>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

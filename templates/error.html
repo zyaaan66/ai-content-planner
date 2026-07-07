@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Error {{ code }} · AI Content Planner</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="min-h-screen flex items-center justify-center">
+  <div class="text-center px-4">
+    <p class="font-display text-7xl font-bold text-[var(--accent-primary)]">{{ code }}</p>
+    <p class="text-[var(--text-muted)] mt-3">{{ message }}</p>
+    <a href="/" class="inline-block mt-6 bg-[var(--accent-primary)] text-white text-sm font-medium rounded-lg px-5 py-2.5">
+      Go back home
+    </a>
+  </div>
+</body>
+</html>

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Saved Prompts · AI Content Planner{% endblock %}
+{% block content %}
+
+<div class="mb-6">
+  <h1 class="font-display font-semibold text-2xl">Saved Prompts</h1>
+  <p class="text-[var(--text-muted)] text-sm mt-1">Reuse your best-performing prompts.</p>
+</div>
+
+<div class="grid lg:grid-cols-3 gap-5">
+  <form method="POST" class="glass-card p-5 space-y-4 h-fit">
+    {{ form.hidden_tag() }}
+    <div>
+      <label class="text-xs text-[var(--text-muted)] mb-1 block">Title</label>
+      {{ form.title(class="w-full bg-transparent border border-[var(--glass-border)] rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[var(--accent-primary)]") }}
+      {% for error in form.title.errors %}<p class="text-[var(--danger)] text-xs mt-1">{{ error }}</p>{% endfor %}
+    </div>
+    <div>
+      <label class="text-xs text-[var(--text-muted)] mb-1 block">Prompt Text</label>
+      {{ form.prompt_text(rows=5, class="w-full bg-transparent border border-[var(--glass-border)] rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[var(--accent-primary)] resize-none") }}
+      {% for error in form.prompt_text.errors %}<p class="text-[var(--danger)] text-xs mt-1">{{ error }}</p>{% endfor %}
+    </div>
+    <button type="submit" class="w-full bg-[var(--accent-primary)] text-white text-sm font-medium rounded-lg py-2.5">Save Prompt</button>
+  </form>
+
+  <div class="lg:col-span-2 space-y-2">
+    {% for p in prompts %}
+    <div class="glass-card p-4">
+      <div class="flex items-center justify-between mb-1.5">
+        <span class="text-sm font-medium">{{ p.title }}</span>
+        <form method="POST" action="{{ url_for('main.delete_saved_prompt', prompt_id=p.id) }}" onsubmit="return confirm('Delete this prompt?');">
+          <button type="submit" class="text-[var(--danger)] text-xs">Delete</button>
+        </form>
+      </div>
+      <p class="text-xs text-[var(--text-muted)] font-mono line-clamp-2">{{ p.prompt_text }}</p>
+    </div>
+    {% else %}
+    <div class="glass-card p-8 text-center text-[var(--text-muted)] text-sm">No saved prompts yet.</div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

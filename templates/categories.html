@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Categories · AI Content Planner{% endblock %}
+{% block content %}
+
+<div class="mb-6">
+  <h1 class="font-display font-semibold text-2xl">Categories</h1>
+  <p class="text-[var(--text-muted)] text-sm mt-1">Organize your content into categories.</p>
+</div>
+
+<div class="grid lg:grid-cols-3 gap-5">
+  <form method="POST" class="glass-card p-5 space-y-4 h-fit">
+    {{ form.hidden_tag() }}
+    <div>
+      <label class="text-xs text-[var(--text-muted)] mb-1 block">Name</label>
+      {{ form.name(class="w-full bg-transparent border border-[var(--glass-border)] rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[var(--accent-primary)]") }}
+      {% for error in form.name.errors %}<p class="text-[var(--danger)] text-xs mt-1">{{ error }}</p>{% endfor %}
+    </div>
+    <div>
+      <label class="text-xs text-[var(--text-muted)] mb-1 block">Color</label>
+      {{ form.color(type="color", class="w-full h-10 bg-transparent border border-[var(--glass-border)] rounded-lg") }}
+    </div>
+    <button type="submit" class="w-full bg-[var(--accent-primary)] text-white text-sm font-medium rounded-lg py-2.5">Add Category</button>
+  </form>
+
+  <div class="lg:col-span-2 space-y-2">
+    {% for cat in categories %}
+    <div class="glass-card p-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="w-3 h-3 rounded-full" style="background: {{ cat.color }}"></span>
+        <span class="text-sm font-medium">{{ cat.name }}</span>
+        <span class="text-xs text-[var(--text-muted)] font-mono">{{ cat.contents.count() }} items</span>
+      </div>
+      <form method="POST" action="{{ url_for('main.delete_category', category_id=cat.id) }}" onsubmit="return confirm('Delete this category?');">
+        <button type="submit" class="text-[var(--danger)] text-xs">Delete</button>
+      </form>
+    </div>
+    {% else %}
+    <div class="glass-card p-8 text-center text-[var(--text-muted)] text-sm">No categories yet.</div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

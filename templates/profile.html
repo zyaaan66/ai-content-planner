@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Profile · AI Content Planner{% endblock %}
+{% block content %}
+
+<div class="mb-6">
+  <h1 class="font-display font-semibold text-2xl">Profile</h1>
+  <p class="text-[var(--text-muted)] text-sm mt-1">Manage your account details.</p>
+</div>
+
+<div class="grid lg:grid-cols-3 gap-5">
+  <form method="POST" class="lg:col-span-2 glass-card p-6 space-y-4">
+    {{ form.hidden_tag() }}
+    <div>
+      <label class="text-xs text-[var(--text-muted)] mb-1 block">Full Name</label>
+      {{ form.full_name(class="w-full bg-transparent border border-[var(--glass-border)] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[var(--accent-primary)]") }}
+    </div>
+    <div>
+      <label class="text-xs text-[var(--text-muted)] mb-1 block">Email</label>
+      {{ form.email(class="w-full bg-transparent border border-[var(--glass-border)] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[var(--accent-primary)]") }}
+      {% for error in form.email.errors %}<p class="text-[var(--danger)] text-xs mt-1">{{ error }}</p>{% endfor %}
+    </div>
+    <div>
+      <label class="text-xs text-[var(--text-muted)] mb-1 block">Avatar URL</label>
+      {{ form.avatar_url(class="w-full bg-transparent border border-[var(--glass-border)] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[var(--accent-primary)]", placeholder="https://...") }}
+    </div>
+    <button type="submit" class="bg-[var(--accent-primary)] text-white text-sm font-medium rounded-lg px-5 py-2.5">Save Changes</button>
+  </form>
+
+  <div class="glass-card p-6">
+    <h2 class="font-display font-semibold mb-4 text-sm">Recent Activity</h2>
+    <div class="space-y-3">
+      {% for log in recent_activity %}
+      <div class="text-xs border-b border-[var(--glass-border)] pb-2 last:border-0">
+        <p class="text-[var(--text-primary)]">{{ log.action.replace('_', ' ')|title }}</p>
+        <p class="text-[var(--text-faint)] font-mono">{{ log.created_at.strftime('%b %d, %H:%M') }}</p>
+      </div>
+      {% else %}
+      <p class="text-[var(--text-muted)] text-xs">No activity recorded yet.</p>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

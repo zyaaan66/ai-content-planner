@@ -1,0 +1,167 @@
+/* ==========================================================================
+   AI Content Planner — Design Tokens
+   Palette: near-black base + violet/teal AI-accent duo (not the generic
+   cream/terracotta or acid-green defaults). Display face: Space Grotesk.
+   Body: Inter. Data/mono: JetBrains Mono.
+   ========================================================================== */
+
+:root {
+  --bg-base: #0b0e14;
+  --bg-elevated: #111521;
+  --glass-bg: rgba(255, 255, 255, 0.045);
+  --glass-border: rgba(255, 255, 255, 0.09);
+  --accent-primary: #7c5cfc;
+  --accent-primary-soft: rgba(124, 92, 252, 0.15);
+  --accent-secondary: #22d3c7;
+  --text-primary: #e8e9ed;
+  --text-muted: #9096a6;
+  --text-faint: #5c6272;
+  --success: #34d399;
+  --warning: #fbbf24;
+  --danger: #f87171;
+  --radius-lg: 18px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
+}
+
+:root.light {
+  --bg-base: #f5f6fa;
+  --bg-elevated: #ffffff;
+  --glass-bg: rgba(17, 21, 33, 0.03);
+  --glass-border: rgba(17, 21, 33, 0.08);
+  --text-primary: #14161f;
+  --text-muted: #565c6b;
+  --text-faint: #8a90a0;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: "Inter", system-ui, sans-serif;
+  transition: background 0.3s ease, color 0.3s ease;
+  min-height: 100vh;
+}
+
+.font-display { font-family: "Space Grotesk", "Inter", sans-serif; }
+.font-mono { font-family: "JetBrains Mono", monospace; }
+
+/* Ambient AI-pulse glow behind hero/sidebar brand mark */
+.ai-pulse {
+  position: relative;
+}
+.ai-pulse::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 999px;
+  background: radial-gradient(circle, var(--accent-primary) 0%, transparent 70%);
+  opacity: 0.5;
+  filter: blur(6px);
+  animation: pulseGlow 2.6s ease-in-out infinite;
+  z-index: -1;
+}
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.35; transform: scale(0.95); }
+  50% { opacity: 0.65; transform: scale(1.08); }
+}
+
+/* Glass card */
+.glass-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-radius: var(--radius-lg);
+}
+
+.glass-card-hover {
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+.glass-card-hover:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-primary);
+}
+
+/* Gradient border used when AI is actively generating */
+.ai-active-border {
+  position: relative;
+  border-radius: var(--radius-lg);
+}
+.ai-active-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: linear-gradient(120deg, var(--accent-primary), var(--accent-secondary), var(--accent-primary));
+  background-size: 200% 200%;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: gradientShift 3s linear infinite;
+}
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+/* Skeleton loading */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--glass-bg) 25%,
+    rgba(124, 92, 252, 0.12) 37%,
+    var(--glass-bg) 63%
+  );
+  background-size: 400% 100%;
+  animation: skeletonShimmer 1.4s ease infinite;
+  border-radius: var(--radius-sm);
+}
+@keyframes skeletonShimmer {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Sidebar */
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 0.9rem;
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  font-weight: 500;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.sidebar-link:hover {
+  background: var(--glass-bg);
+  color: var(--text-primary);
+}
+.sidebar-link.active {
+  background: var(--accent-primary-soft);
+  color: var(--accent-primary);
+}
+
+/* Toast */
+.toast {
+  animation: toastIn 0.25s ease, toastOut 0.3s ease 4.2s forwards;
+}
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes toastOut {
+  to { opacity: 0; transform: translateY(-10px); }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 999px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ai-pulse::before, .ai-active-border::before, .skeleton, .toast { animation: none !important; }
+}

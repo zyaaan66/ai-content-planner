@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Settings · AI Content Planner{% endblock %}
+{% block content %}
+
+<div class="mb-6">
+  <h1 class="font-display font-semibold text-2xl">Settings</h1>
+  <p class="text-[var(--text-muted)] text-sm mt-1">Configure your app preferences.</p>
+</div>
+
+<form method="POST" class="glass-card p-6 max-w-lg space-y-5">
+  <div class="flex items-center justify-between">
+    <div>
+      <p class="text-sm font-medium">Dark Mode</p>
+      <p class="text-xs text-[var(--text-muted)]">Toggle the interface theme.</p>
+    </div>
+    <label class="relative inline-flex items-center cursor-pointer">
+      <input type="checkbox" name="dark_mode" {{ 'checked' if current_user.dark_mode }} class="sr-only peer">
+      <div class="w-11 h-6 bg-[var(--glass-border)] rounded-full peer peer-checked:bg-[var(--accent-primary)] transition-colors"></div>
+      <div class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-5"></div>
+    </label>
+  </div>
+
+  <div class="border-t border-[var(--glass-border)] pt-5">
+    <p class="text-sm font-medium mb-1">Gemini API Key</p>
+    <p class="text-xs text-[var(--text-muted)]">
+      Configured via environment variable <code class="font-mono">GEMINI_API_KEY</code> on the server — never stored in the database for security.
+    </p>
+  </div>
+
+  <button type="submit" class="bg-[var(--accent-primary)] text-white text-sm font-medium rounded-lg px-5 py-2.5">Save Settings</button>
+</form>
+{% endblock %}
